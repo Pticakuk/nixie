@@ -23,16 +23,16 @@
           GitHub
         </a>
       </div>
-      <Categories/>
+      <Task/>
     </div>
   </div>
 </template>
 
 <script>
-  import Categories from '../components/Categories';
+  import Task from '../../../components/Task';
 export default {
   comments: {
-    Categories
+    Task
   }
 }
 </script>

@@ -23,16 +23,16 @@
           GitHub
         </a>
       </div>
-      <Categories/>
+      <Category/>
     </div>
   </div>
 </template>
 
 <script>
-  import Categories from '../components/Categories';
+  import Category from '../../components/Category';
 export default {
   comments: {
-    Categories
+    Category
   }
 }
 </script>

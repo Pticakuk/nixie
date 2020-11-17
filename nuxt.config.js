@@ -1,5 +1,9 @@
 export default {
   // Global page headers (https://go.nuxtjs.dev/config-head)
+  env: {
+    CTF_SPACE_ID: 'hlnzgc8svl05',
+    CTF_CDA_ACCESS_TOKEN: 'D2Ay6CugVNl0VlReQGlJUhoReJ-tc222jMtqDM2dPdc',
+  },
   head: {
     title: 'nixie',
     meta: [
