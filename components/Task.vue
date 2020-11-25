@@ -2,17 +2,28 @@
   <section class="a-section categories-section">
     <div class="task" v-if="task">
       <h1>{{task.fields.name}}</h1>
-      <div class="video">
-        <iframe width="560" height="315" :src="task.fields.cartoonUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="video"
+        :class="{'video--show': showCartoon}">
+        <iframe width="560" height="315" :src="task.fields.cartoonUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+        <div class="puzzle-wrap">
+          <div class="puzzle" v-for="puzzle in puzzleCount" :key="puzzle"></div>
+        </div>
       </div>
       <div class="preview">
-        <img :src="task.fields.preview.fields.file.url" alt="" width="560">
+<!--        <img :src="task.fields.preview.fields.file.url" alt="" width="560">-->
       </div>
-      <div class="riddles">
-        <div class="riddle" v-for="riddle in task.fields.riddles">
-          <h1 class="question">{{riddle.fields.question}}</h1>
-          <div class="answer">
-            <img :src="riddle.fields.answer.fields.file.url" alt="" width="150">
+      <div class="riddles-wrap"
+           :class="{'riddles-wrap--hide': showCartoon || hideCartoon}">
+        <div content="active-riddle" v-if="activeRiddle">
+          <h1 class="active-riddle__question">{{activeRiddle.fields.question}}</h1>
+        </div>
+        <div class="riddles">
+          <div class="riddle" v-for="riddle in allRiddles">
+            <div class="answer"
+              @click="selectAnswer(riddle)">
+              <img :src="riddle.fields.answer.fields.file.url" alt="" width="150">
+            </div>
           </div>
         </div>
       </div>
@@ -21,12 +32,25 @@
 </template>
 <script>
   import { createClient } from '../plugins/contentful.js';
+  import JQuery from 'jquery'
+  let $ = JQuery;
   const client = createClient();
 
   export default {
     data() {
       return {
         task: null,
+        puzzleCount: 10,
+        rightAnsver: 0,
+        attempts: 8,
+        allRiddles: [],
+        showCartoon: false,
+        hideCartoon: false,
+      }
+    },
+    computed: {
+      activeRiddle() {
+        return this.allRiddles.find(riddle => riddle.active);
       }
     },
     methods: {
@@ -37,11 +61,50 @@
             'fields.slug[in]': this.$route.params.slug,
           });
           this.task = task.items[0];
-          console.log(this.task);
+          this.allRiddles = this.task.fields.riddles
+            .map((riddle) => {
+              return {
+                ...riddle,
+                active: false,
+                alreadyShown: false,
+              }
+            })
+            .sort(() => .5 - Math.random());
+          this.showRiddles();
         }
         catch (err) {
           console.log(err);
         }
+      },
+      showRiddles() {
+        this.allRiddles = this.allRiddles.map((riddle) => {
+          return {...riddle, active: false}
+        });
+        const currentRiddle = this.allRiddles.find(riddle => !riddle.alreadyShown);
+        currentRiddle.active = true;
+        currentRiddle.alreadyShown = true;
+        this.allRiddles.sort(() => .5 - Math.random());
+      },
+      selectAnswer(riddle) {
+        this.attempts -= 1;
+        if (this.activeRiddle.sys.id === riddle.sys.id) {
+          this.rightAnsver += 1;
+          const puzzleNumber = (this.randomInteger(0, $('.puzzle').length));
+          $($('.puzzle')[0]).removeClass('puzzle').addClass('puzzle--hidden');
+          if (this.rightAnsver >= this.puzzleCount) {
+            this.puzzleCount -= 1;
+            this.showCartoon = true;
+          }
+        } else if(this.attempts === 0){
+          this.hideCartoon = true;
+        }
+        this.showRiddles();
+        console.log(riddle);
+      },
+      randomInteger(min, max) {
+        // случайное число от min до (max+1)
+        let rand = min + Math.random() * (max + 1 - min);
+        return Math.floor(rand);
       }
     },
     mounted() {
@@ -51,5 +114,70 @@
 </script>
 
 <style>
-
+  .riddles {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  .riddle {
+    width: 15%;
+    cursor: pointer;
+    margin-bottom: 50px;
+  }
+  .active-riddle__question {
+    text-align: center;
+    font-size: 150px;
+    color: #555;
+    text-transform: uppercase;
+    font-family: Arial, sans-serif;
+  }
+  .video {
+    width: 560px;
+    height: 315px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .video iframe {
+    position: relative;
+    z-index: 1;
+  }
+  .video--show .puzzle-wrap {
+    opacity: 0;
+    max-height: 0;
+  }
+  .puzzle-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: absolute;
+    z-index: 2;
+    top:0;
+    left:0;
+  }
+  .riddles-wrap {
+    max-height: 1000px;
+    transition: 1000ms;
+  }
+  .riddles-wrap--hide {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  .puzzle,
+  .puzzle--hidden {
+    width: 20%;
+    height: 50%;
+    background: grey;
+    opacity: 0.9;
+    background: url("../assets/images/questions.jpg") center no-repeat;
+    background-size: cover;
+    transition: 500ms;
+  }
+  .puzzle--hidden {
+    opacity: 0;
+  }
 </style>
