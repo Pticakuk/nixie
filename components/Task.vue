@@ -42,7 +42,7 @@
         task: null,
         puzzleCount: 10,
         rightAnsver: 0,
-        attempts: 8,
+        attempts: 10,
         allRiddles: [],
         shovedRiddle: [],
         showCartoon: false,
@@ -139,8 +139,8 @@
   }
   .riddle img{
     position: absolute;
-    height: 100%;
-    width: auto;
+    height: auto;
+    width: 100%;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
