@@ -19,7 +19,7 @@
           <h1 class="active-riddle__question">{{activeRiddle.fields.question}}</h1>
         </div>
         <div class="riddles">
-          <div class="riddle" v-for="riddle in allRiddles">
+          <div class="riddle" v-for="riddle in shovedRiddle">
             <div class="answer"
               @click="selectAnswer(riddle)">
               <img :src="riddle.fields.answer.fields.file.url" alt="" width="150">
@@ -44,6 +44,7 @@
         rightAnsver: 0,
         attempts: 8,
         allRiddles: [],
+        shovedRiddle: [],
         showCartoon: false,
         hideCartoon: false,
       }
@@ -83,7 +84,9 @@
         const currentRiddle = this.allRiddles.find(riddle => !riddle.alreadyShown);
         currentRiddle.active = true;
         currentRiddle.alreadyShown = true;
+        this.shovedRiddle = [...this.allRiddles.filter(riddle => !riddle.active).slice(0,7), currentRiddle];
         this.allRiddles.sort(() => .5 - Math.random());
+        this.shovedRiddle.sort(() => .5 - Math.random());
       },
       selectAnswer(riddle) {
         this.attempts -= 1;
@@ -117,13 +120,30 @@
   .riddles {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     flex-wrap: wrap;
+    max-width: 1000px;
+    margin: 0 auto;
   }
   .riddle {
-    width: 15%;
+    width: 200px;
+    height: 200px;
     cursor: pointer;
-    margin-bottom: 50px;
+    position: relative;
+    margin: 20px;
+    overflow: hidden;
+    transition: 2000ms;
+  }
+  .riddle:hover {
+    box-shadow: 0 0 10px blue;
+  }
+  .riddle img{
+    position: absolute;
+    height: 100%;
+    width: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
   }
   .active-riddle__question {
     text-align: center;
@@ -141,10 +161,15 @@
   .video iframe {
     position: relative;
     z-index: 1;
+    transition: 2000ms;
   }
   .video--show .puzzle-wrap {
     opacity: 0;
     max-height: 0;
+  }
+  .video--show iframe {
+    width: 700px;
+    height: 400px;
   }
   .puzzle-wrap {
     width: 100%;
@@ -160,7 +185,7 @@
   }
   .riddles-wrap {
     max-height: 1000px;
-    transition: 1000ms;
+    transition: 2000ms;
   }
   .riddles-wrap--hide {
     opacity: 0;
@@ -173,8 +198,8 @@
     height: 50%;
     background: grey;
     opacity: 0.9;
-    background: url("../assets/images/questions.jpg") center no-repeat;
-    background-size: cover;
+    background: url("../assets/images/questions.jpg") center no-repeat rgba(255,255,255, 0.7);
+    background-size: 100% 100%;
     transition: 500ms;
   }
   .puzzle--hidden {
