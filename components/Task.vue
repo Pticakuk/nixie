@@ -40,7 +40,7 @@
     data() {
       return {
         task: null,
-        puzzleCount: 10,
+        puzzleCount: 16,
         rightAnsver: 0,
         attempts: 8,
         allRiddles: [],
@@ -71,6 +71,8 @@
               }
             })
             .sort(() => .5 - Math.random());
+          this.attempts = this.allRiddles.length;
+          alert(this.attempts);
           this.showRiddles();
         }
         catch (err) {
@@ -102,7 +104,6 @@
           this.hideCartoon = true;
         }
         this.showRiddles();
-        console.log(riddle);
       },
       randomInteger(min, max) {
         // случайное число от min до (max+1)
@@ -132,14 +133,14 @@
     position: relative;
     margin: 20px;
     overflow: hidden;
-    transition: 2000ms;
+    transition: 500ms;
   }
   .riddle:hover {
-    box-shadow: 0 0 10px blue;
+    box-shadow: 0 0 10px brown;
   }
   .riddle img{
     position: absolute;
-    height: 100%;
+    height: 80%;
     width: auto;
     top: 50%;
     left: 50%;
@@ -194,7 +195,7 @@
   }
   .puzzle,
   .puzzle--hidden {
-    width: 20%;
+    width: 12.5%;
     height: 50%;
     background: grey;
     opacity: 0.9;
