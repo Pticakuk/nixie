@@ -140,8 +140,8 @@
   }
   .riddle img{
     position: absolute;
-    height: 80%;
-    width: auto;
+    height: auto;
+    width: 100%;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
