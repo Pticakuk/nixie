@@ -72,7 +72,6 @@
             })
             .sort(() => .5 - Math.random());
           this.attempts = this.allRiddles.length;
-          alert(this.attempts);
           this.showRiddles();
         }
         catch (err) {
