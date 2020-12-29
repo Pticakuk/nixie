@@ -15,15 +15,28 @@
       </div>
       <div class="riddles-wrap"
            :class="{'riddles-wrap--hide': showCartoon || hideCartoon}">
-        <div content="active-riddle" v-if="activeRiddle">
-          <h1 class="active-riddle__question">{{activeRiddle.fields.question}}</h1>
-        </div>
-        <div class="riddles">
-          <div class="riddle" v-for="riddle in shovedRiddle">
-            <div class="answer"
-              @click="selectAnswer(riddle)">
-              <img :src="riddle.fields.answer.fields.file.url" alt="" width="150">
+        <div v-if="tackType === 'reading'">
+          <div class="active-riddle" v-if="activeRiddle">
+            <h1 class="active-riddle__question">{{activeRiddle.fields.question}}</h1>
+          </div>
+          <div class="riddles">
+            <div class="riddle" v-for="riddle in shovedRiddle">
+              <div class="answer"
+                   @click="selectAnswer(riddle)">
+                <img :src="riddle.fields.answer.fields.file.url" alt="" width="150">
+              </div>
             </div>
+          </div>
+        </div>
+        <div v-if="tackType === 'mathematics'">
+          <div class="active-math-riddle" v-if="activeRiddle">
+            <div class="math-riddle__number">{{activeRiddle.fields.firstNumber}}</div>
+            <div class="math-riddle__sign">{{activeRiddle.fields.sign}}</div>
+            <div class="math-riddle__number">{{activeRiddle.fields.secondNumber}}</div>
+          </div>
+          <div class="math-riddle__answer">
+            <input type="number" ref="mathAnswer" v-model="mathAnsver">
+            <button @click="onMathAnswer(activeRiddle)">Вiдповicти</button>
           </div>
         </div>
       </div>
@@ -47,11 +60,15 @@
         shovedRiddle: [],
         showCartoon: false,
         hideCartoon: false,
+        mathAnsver: '',
       }
     },
     computed: {
       activeRiddle() {
         return this.allRiddles.find(riddle => riddle.active);
+      },
+      tackType() {
+        return this.task.fields.tackType.fields.slug;
       }
     },
     methods: {
@@ -101,6 +118,7 @@
           }
         } else if(this.attempts === 0){
           this.hideCartoon = true;
+          return;
         }
         this.showRiddles();
       },
@@ -108,6 +126,45 @@
         // случайное число от min до (max+1)
         let rand = min + Math.random() * (max + 1 - min);
         return Math.floor(rand);
+      },
+      onMathAnswer(mathRiddle) {
+        this.attempts -= 1;
+        if (this.mathAnsver) {
+          const sign = mathRiddle.fields.sign;
+          let answer = '';
+          switch (sign) {
+            case '-': {
+              answer = mathRiddle.fields.firstNumber - mathRiddle.fields.secondNumber;
+              break;
+            }
+            case '*': {
+              answer = mathRiddle.fields.firstNumber * mathRiddle.fields.secondNumber;
+              break;
+            }
+            case '/': {
+              answer = mathRiddle.fields.firstNumber / mathRiddle.fields.secondNumber;
+              break;
+            }
+            default: {
+              answer = mathRiddle.fields.firstNumber + mathRiddle.fields.secondNumber;
+            }
+          }
+          if(answer === (this.mathAnsver)*1) {
+            this.rightAnsver += 1;
+            const puzzleNumber = (this.randomInteger(0, $('.puzzle').length));
+            $($('.puzzle')[0]).removeClass('puzzle').addClass('puzzle--hidden');
+            if (this.rightAnsver >= this.puzzleCount) {
+              this.puzzleCount -= 1;
+              this.showCartoon = true;
+            }
+          } else if(this.attempts === 0){
+            this.hideCartoon = true;
+            return;
+          }
+            this.mathAnsver = '';
+            this.$refs.mathAnswer.focus()
+            this.showRiddles();
+          }
       }
     },
     mounted() {
@@ -204,5 +261,50 @@
   }
   .puzzle--hidden {
     opacity: 0;
+  }
+  .active-math-riddle,
+  .math-riddle__answer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+  }
+  .math-riddle__number {
+    font-size: 90px;
+    font-family: Arial, sans-serif;
+  }
+  .math-riddle__sign {
+    font-size: 100px;
+    margin: 0 50px;
+    font-weight: bold;
+  }
+  .math-riddle__answer {
+    flex-direction: column;
+  }
+  .math-riddle__answer input {
+    font-size: 70px;
+    text-align: center;
+    width: 300px;
+    height: 60px;
+    color: darkblue;
+    border: 0;
+    outline: none;
+    box-shadow: 2px 2px 10px #777;
+  }
+  .math-riddle__answer button {
+    background: rgb(2,147,113);
+    color: white;
+    font-size: 40px;
+    border-radius: 5px;
+    height: 60px;
+    margin-top: 30px;
+    border: 0;
+    box-shadow: 2px 2px 10px #777;
+    padding:  0 50px;
+    transition: 300ms;
+  }
+  .math-riddle__answer button:hover {
+    background: rgb(54,183,124);
   }
 </style>

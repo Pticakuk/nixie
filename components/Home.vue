@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Выбери категорию</h1>
+    <h1 class="p-title">Выбери категорию</h1>
     <div>
       <Categories/>
     </div>
@@ -17,5 +17,14 @@
 </script>
 
 <style>
-
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #F7BBCF;
+}
+  .p-title {
+    margin-bottom: 30px;
+  }
 </style>

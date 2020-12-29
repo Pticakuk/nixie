@@ -16,12 +16,15 @@
       }
     },
     methods: {
-      async getCategoryTasks() {
+      async getCategoryTasks(type) {
         try {
           const categoryTasks = await client.getEntries({
             'content_type': 'task',
           });
-          this.categoryTasks = categoryTasks.items
+          this.categoryTasks = categoryTasks.items.filter(item => {
+            return item.fields.tackType.fields.slug === type;
+          });
+          console.log(this.categoryTasks);
         }
         catch (err) {
           console.log(err);
@@ -29,8 +32,7 @@
       }
     },
     mounted() {
-      console.log(this.$route.params.slug);
-      this.getCategoryTasks();
+      this.getCategoryTasks(this.$route.params.slug);
     }
   };
 </script>

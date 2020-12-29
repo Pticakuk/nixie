@@ -1,7 +1,7 @@
 <template>
   <section class="a-section categories-section">
     <div class="category" v-for="categiry in categiries">
-      <nuxt-link :to="`/${categiry.fields.slug}`">{{categiry.fields.name}}</nuxt-link>
+      <nuxt-link class="category-link" :to="`/${categiry.fields.slug}`">{{categiry.fields.name}}</nuxt-link>
     </div>
   </section>
 </template>
@@ -36,5 +36,8 @@
 </script>
 
 <style>
-
+.category a {
+  font-size: 30px;
+  color: white;
+}
 </style>
