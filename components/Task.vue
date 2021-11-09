@@ -7,7 +7,8 @@
         <iframe width="560" height="315" :src="task.fields.cartoonUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
         </iframe>
         <div class="puzzle-wrap">
-          <div class="puzzle" v-for="puzzle in puzzleCount" :key="puzzle"></div>
+          <div class="puzzle" v-for="puzzle in puzzleCount" :key="puzzle"
+          :style="`width: ${100 / (puzzleCount / 2)}%`"></div>
         </div>
       </div>
       <div class="preview">
@@ -17,7 +18,14 @@
            :class="{'riddles-wrap--hide': showCartoon || hideCartoon}">
         <div v-if="tackType === 'reading'">
           <div class="active-riddle" v-if="activeRiddle">
-            <h1 class="active-riddle__question">{{activeRiddle.fields.question}}</h1>
+            <div v-if="activeRiddle.fields.riddle && activeRiddle.fields.riddle.content && activeRiddle.fields.riddle.content.length"
+            class="active-riddle__text">
+              <p v-for="p in activeRiddle.fields.riddle.content">
+                {{p.content[0].value}}
+              </p>
+            </div>
+            <h1 class="active-riddle__question" v-else>{{activeRiddle.fields.question}}</h1>
+
           </div>
           <div class="riddles">
             <div class="riddle" v-for="riddle in shovedRiddle">
@@ -53,9 +61,9 @@
     data() {
       return {
         task: null,
-        puzzleCount: 16,
+        puzzleCount: 4,
         rightAnsver: 0,
-        attempts: 8,
+        attempts: 4,
         allRiddles: [],
         shovedRiddle: [],
         showCartoon: false,
@@ -65,6 +73,7 @@
     },
     computed: {
       activeRiddle() {
+        console.log(this.allRiddles.find(riddle => riddle.active));
         return this.allRiddles.find(riddle => riddle.active);
       },
       tackType() {
@@ -115,6 +124,7 @@
           if (this.rightAnsver >= this.puzzleCount) {
             this.puzzleCount -= 1;
             this.showCartoon = true;
+            return;
           }
         } else if(this.attempts === 0){
           this.hideCartoon = true;
@@ -202,12 +212,17 @@
     left: 50%;
     transform: translate(-50%,-50%);
   }
-  .active-riddle__question {
+  .active-riddle__question,
+  .active-riddle__text{
     text-align: center;
     font-size: 150px;
     color: #555;
-    text-transform: uppercase;
     font-family: Arial, sans-serif;
+  }
+  .active-riddle__text{
+    font-size: 40px;
+    font-weight: 900;
+    white-space: pre-line;
   }
   .video {
     width: 560px;
@@ -251,7 +266,6 @@
   }
   .puzzle,
   .puzzle--hidden {
-    width: 12.5%;
     height: 50%;
     background: grey;
     opacity: 0.9;
